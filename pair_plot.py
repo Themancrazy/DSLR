@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 def makeScattering():
 	file = open('resources/dataset_train.csv')
 	df = pd.read_csv(file)
-	# df = df.loc[:, ("Hogwarts House", "Astronomy", "Herbology")]
+	df = df.loc[:, ("Hogwarts House", "Charms", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Ancient Runes")]
 	df = df.dropna(how='any', axis=0)
 	sns.pairplot(df, hue="Hogwarts House")
 	plt.show()
