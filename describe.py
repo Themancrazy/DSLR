@@ -77,6 +77,7 @@ def isRealNumb(elem):
 def displayFeatures(filename):
 	file = open(filename)
 	df = pd.read_csv(file)
+	# df = df.dropna()
 	columns = list(df)
 	da = dataAnalysis()
 	labelRow = [""]

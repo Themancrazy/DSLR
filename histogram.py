@@ -9,6 +9,9 @@ from matplotlib import pyplot as figure
 def plotHistogram(courses, houses, ravenMeans, slythMeans, gryffMeans, hufflMeans):
     df = pd.DataFrame({'Ravenclaw': ravenMeans, 'Slytherin': slythMeans, 'Gryffindor': gryffMeans, 'Hufflepuff': hufflMeans}, index=courses)
     ax = df.plot.bar(rot=0)
+    plt.xlabel("Subjects")
+    plt.ylabel("Scores")
+    plt.title("Each class's average score per house")
     plt.show()
 
 def normalizeValue(value, minVal, maxVal):
