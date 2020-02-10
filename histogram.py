@@ -1,48 +1,42 @@
-# Display mean of score of each house per course.
-
 import sys
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import pyplot as figure
 
-def plotHistogram(courses, houses, ravenMeans, slythMeans, gryffMeans, hufflMeans):
-    df = pd.DataFrame({'Ravenclaw': ravenMeans, 'Slytherin': slythMeans, 'Gryffindor': gryffMeans, 'Hufflepuff': hufflMeans}, index=courses)
-    ax = df.plot.bar(rot=0)
-    plt.xlabel("Subjects")
-    plt.ylabel("Scores")
-    plt.title("Each class's average score per house")
-    plt.show()
+def normalize_column(c):
+	return ((c - c.min()) / (c.max() - c.min()))
 
-def normalizeValue(value, minVal, maxVal):
-    return (value - minVal) / (maxVal - minVal)
+def create_graph(df, course, houses, axs, row, col):
+	colors = ["red", "blue", "green", "deeppink"]
+	column = normalize_column(df[course])
+	for house, color in zip(houses, colors):
+		axs[row, col].hist(column.loc[df["Hogwarts House"] == house], 15, facecolor=color, label=house)
+	axs[row, col].set_title(course + " Homogeneity")
+	axs[row, col].legend()
+	for ax in axs.flat:
+ 	   ax.set(xlabel='Score', ylabel='Amount of students')
 
-def findMean(course, house, df):
-    data = df.loc[df['Hogwarts House'] == house, course]
-    return normalizeValue(data.mean(), data.min(), data.max())
+def make_histogram(df):
+	col = 0
+	row = 0
+	houses = ["Hufflepuff", "Ravenclaw", "Slytherin", "Gryffindor"]
+	courses = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
+	fig, axs = plt.subplots(4, 4)
+	for course in courses:
+		create_graph(df, course, houses, axs, row, col)
+		if col == 3:
+			col = 0
+			row += 1
+		else:
+			col += 1
+	plt.show()
 
-def makeHistogram():
-    file = open("resources/dataset_train.csv")
-    df = pd.read_csv(file)
-    courses = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
-    houses = ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]
-    ravenMeans = []
-    slythMeans = []
-    gryffMeans = []
-    hufflMeans = []
-    for c in courses:
-        meanForClass = []
-        for h in houses:
-            meanForClass.append(findMean(c, h, df))
-        ravenMeans.append(meanForClass[0])
-        slythMeans.append(meanForClass[1])
-        gryffMeans.append(meanForClass[2])
-        hufflMeans.append(meanForClass[3])
-    plotHistogram(courses, houses, ravenMeans, slythMeans, gryffMeans, hufflMeans)
-        
 
 if __name__ == "__main__":
-    if len(sys.argv) != 1:
-        print("histogram doesn't take arguments.")
-        exit(1)
-    makeHistogram()
+	if len(sys.argv) != 1:
+		print("histogram doesn't take arguments.")
+		exit(1)
+	file = open("resources/dataset_train.csv")
+	df = pd.read_csv(file)
+	make_histogram(df)
