@@ -2,10 +2,12 @@
 # All it has to do is to display information for all numerical features in a dataset.
 
 import pandas as pd
+import numpy as np
 import re
 import sys
 from math import sqrt
 from math import floor
+from math import ceil
 
 class dataAnalysis:
 	def dataAnalysisCount(self):
@@ -19,10 +21,10 @@ class dataAnalysis:
 		return total
 
 	def dataAnalysisStd(self):
-		std = 0
+		var = 0
 		for nb in self.column:
-			std += (nb - self.mean)
-		std = sqrt((std ** 2) / (self.count - 1))
+			var += ((nb - self.mean) ** 2)
+		std = sqrt(var / self.count)
 		return std
 
 	def dataAnalysisMin(self):
@@ -32,10 +34,17 @@ class dataAnalysis:
 				minimumNb = nb
 		return minimumNb
 
-	def dataAnalysisQuant(self, quant):
-		element = floor(self.count * quant) - 1
-		q = self.column[element] + (self.column[element + 1] - self.column[element]) * quant
-		return q
+	def dataAnalysisQuant(self, percent):
+		len_col = len(self.column) - 1
+		column_as_array = np.array(self.column)
+		index = len_col * percent
+		floored_index = floor(index)
+		ceiled_index = ceil(index)
+		if floored_index == ceiled_index:
+			return column_as_array[floored_index]
+		delta_0 = column_as_array[floored_index] * (ceiled_index - index)
+		delta_1 = column_as_array[ceiled_index] * (index - floored_index)
+		return delta_0 + delta_1
 
 	def dataAnalysisMax(self):
 		maximumNb = self.column[0]
@@ -77,7 +86,6 @@ def isRealNumb(elem):
 def displayFeatures(filename):
 	file = open(filename)
 	df = pd.read_csv(file)
-	# df = df.dropna()
 	columns = list(df)
 	da = dataAnalysis()
 	labelRow = [""]
@@ -92,7 +100,8 @@ def displayFeatures(filename):
 	for c in columns:
 		tmpCol = df[c]
 		if tmpCol.dtypes == float or tmpCol.dtypes == int:
-			tmpCol.sort_values(ascending=[True])
+			tmpCol = tmpCol.dropna()
+			tmpCol = tmpCol.sort_values(ascending=[True])
 			labelRow.append(tmpCol.name)
 			da.analyseColumn(tmpCol, countRow, meanRow, stdRow, minRow, quad25Row, quad50Row, quad75Row, maxRow)
 	daTable = []
@@ -103,4 +112,6 @@ if __name__ == "__main__":
 	if len(sys.argv) != 2:
 		print("\x1b[91musage: python3 histogram.py <file.csv>\x1b[0m")
 		exit(1)
+	df = pd.read_csv(sys.argv[1])
+	print(df.describe())
 	displayFeatures(sys.argv[1])
