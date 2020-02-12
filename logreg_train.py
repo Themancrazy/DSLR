@@ -79,7 +79,7 @@ class logisticRegression:
 def logistic_regression():
 	file = open("resources/dataset_train.csv")
 	df = pd.read_csv(file)
-	lr = logisticRegression(df, 5000, 0.01)
+	lr = logisticRegression(df, 20000, 0.001)
 	lr.trainModel()
 
 if __name__ == "__main__":
